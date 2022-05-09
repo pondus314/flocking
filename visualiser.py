@@ -34,7 +34,7 @@ class Visualiser:
 
     def __init__(self):
         self.HEIGHT = 800
-        self.AGENT_RADIUS = 5
+        self.AGENT_SIZE = 5
         self.initialised = False
 
     def setup(self, shape):
@@ -50,23 +50,29 @@ class Visualiser:
 
     def draw_past_positions(self, past_positions):
         for i, agent_positions in enumerate(past_positions):
-            colour = colour_order[i%len(colour_order)].value
+            colour = colour_order[i % len(colour_order)].value
             pygame.draw.lines(self.screen, colour, False, agent_positions.tolist())
 
-    def draw_agents(self, positions):
+    def draw_agents(self, positions, velocities):
         for i, pos in enumerate(positions):
-            colour = colour_order[i%len(colour_order)].value
-            radius = self.AGENT_RADIUS
+            colour = colour_order[i % len(colour_order)].value
+            radius = self.AGENT_SIZE
             pygame.draw.circle(self.screen, colour, pos.tolist(), radius, 0)
             pygame.draw.circle(self.screen, Colour.Black.value, pos.tolist(), radius, 3)
 
-    def render(self, positions, past_positions):
+    def draw_forces(self, poss, *forces):
+        for i in range(len(poss)):
+            for force in forces:
+                pygame.draw.line(self.screen, colour_order[i % len(colour_order)].value, poss[i].tolist(), (poss[i]+10*force[i]).tolist(), 2)
+        pygame.display.flip()
+
+    def render(self, positions, velocities, past_positions):
         if not self.initialised:
             self.setup((1, 1))
             self.initialised = True
         self.clear()
         self.draw_past_positions(past_positions)
-        self.draw_agents(positions)
+        self.draw_agents(positions, velocities)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

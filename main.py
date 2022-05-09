@@ -1,24 +1,41 @@
+import random
 import time
 
 import torch
+import torch_cluster
 
+import data
+import flocking
+import utils
 from environment import EnvironmentBox
 from flocking import ReynoldsFlockingLayer
 
 if __name__ == '__main__':
-    n_envs = 1
-    n_agents = 50
-    env = EnvironmentBox(n_agents, n_envs)
-    env.step(torch.ones((1, n_agents, 2))*200, delta_t=1, limit_f=False)
-    env.step(-torch.ones((1, n_agents, 2))*200, delta_t=1, limit_f=False)
-    forces = torch.abs(torch.rand((n_agents, 2)))
-    print(env.agent_locs)
-    env.step(torch.stack([forces]), delta_t=15, limit_f=False)
-    env.step(torch.stack([-forces]), delta_t=5, limit_f=False)
-    edge_indices = [torch.Tensor(edge_idx).to(torch.long) for edge_idx in env.get_close_neighbours(51)]
-    flocking_layer = ReynoldsFlockingLayer(min_dist=15)
+    # data_writer = utils.DataWriter('.\\data', 'reynolds_3')
+    n_envs = 4
+    n_agents = 200
+    env = EnvironmentBox(n_agents, n_envs, headless=False)
+    # env.step(torch.stack([torch.ones((n_agents, 2))*400]*4, dim=0), delta_t=1, f_limit=0)
+    # env.step(-torch.stack([torch.ones((n_agents, 2))*400]*4, dim=0), delta_t=1, f_limit=0)
+    # forces = torch.abs(torch.rand((n_agents, 2)))
+    # print(env.agent_locs)
+    #
+    # env.step(torch.stack([forces, forces * torch.tensor([1, -1]), -forces,   -forces * torch.tensor([1, -1])], dim=0), delta_t=9, f_limit=0)
+    # env.step(torch.stack([-forces, -forces * torch.tensor([1, -1]),  forces,   forces * torch.tensor([1, -1])], dim=0), delta_t=5, f_limit=0)
+    # edge_indices = env.get_close_neighbours(51)
+    # flocking_layer = ReynoldsFlockingLayer(min_dist=15)
+    #
+    # for i in range(10000):
+    #     edge_indices = env.get_close_neighbours(51)
+    #     upd_forces = torch.stack([flocking_layer(env.agent_locs[j], env.agent_vels[j], edge_indices[j]) for j in range(n_envs)])
+    #     if random.random() < 0.1:
+    #         for j in range(n_envs):
+    #             data_writer.write_data(edge_indices[j], env.agent_locs[j], env.agent_vels[j], upd_forces[j])
+    #     env.step(upd_forces)
 
-    for i in range(20000):
-        edge_indices = [torch.Tensor(edge_idx).to(torch.long) for edge_idx in env.get_close_neighbours(51)]
-        upd_forces = torch.stack([flocking_layer(env.agent_locs[i], env.agent_vels[i], edge_indices[i].T) for i in range(n_envs)])
-        env.step(upd_forces)
+    # data_writer.finish_writing()
+    datas = utils.read_flocking_data('.\\data', 'reynolds_1')
+    dataset = data.FlockingDataset('.\\data', 'reynolds_1')
+    print(dataset[0])
+    mpnnModel = flocking.MPNNFlockingModel()
+    print('done?')

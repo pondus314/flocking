@@ -78,7 +78,7 @@ class MPNNFlockingLayer(MessagePassing):
 
 
 class MPNNFlockingModel(Module):
-    def __init__(self, num_layers=1, emb_dim=64, in_dim=2, edge_dim=0, out_dim=1):
+    def __init__(self, num_layers=1, emb_dim=64, in_dim=2, edge_dim=0, out_dim=2):
         super().__init__()
 
         self.lin_in = Linear(in_dim*2, emb_dim)
@@ -95,4 +95,4 @@ class MPNNFlockingModel(Module):
 
         out = self.lin_pred(acc_new)  # (batch_size, d) -> (batch_size, 1)
 
-        return out.view(-1)
+        return out

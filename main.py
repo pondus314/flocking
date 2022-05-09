@@ -6,9 +6,11 @@ import torch_cluster
 
 import data
 import flocking
+import trainer
 import utils
 from environment import EnvironmentBox
 from flocking import ReynoldsFlockingLayer
+from torch_geometric.data import DataLoader
 
 if __name__ == '__main__':
     # data_writer = utils.DataWriter('.\\data', 'reynolds_3')
@@ -34,8 +36,9 @@ if __name__ == '__main__':
     #     env.step(upd_forces)
 
     # data_writer.finish_writing()
-    datas = utils.read_flocking_data('.\\data', 'reynolds_1')
-    dataset = data.FlockingDataset('.\\data', 'reynolds_1')
-    print(dataset[0])
+    dataset = data.FlockingDataset('.\\data', 'reynolds_3')
     mpnnModel = flocking.MPNNFlockingModel()
+    loader = DataLoader(dataset, batch_size=8, shuffle=True)
+    mpnn_trainer = trainer.ModelTrainer(mpnnModel, 100, 0.1, 0.5, loader, True)
+    mpnn_trainer.train()
     print('done?')

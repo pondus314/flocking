@@ -5,6 +5,7 @@ import glob
 import torch
 import torch.nn.functional as F
 import numpy as np
+import torch_geometric.utils
 from torch_sparse import coalesce
 from torch_geometric.io import read_txt_array
 from torch_geometric.utils import remove_self_loops
@@ -18,6 +19,8 @@ class DataWriter:
         self.node_counter = 0
         self.graph_counter = 0
         base_file_path = osp.join(path, dataset_name)
+        os.mkdir(osp.dirname(path))
+        os.mkdir(path)
         self.files = {
             name: open(base_file_path+f'_{name}.txt', 'a') for name in ['A', 'graph_ind', 'pos', 'vel', 'acc']
         }
@@ -27,7 +30,8 @@ class DataWriter:
         if not self.writeable:
             return
         v = node_poss.shape[0]
-        index_to_file = edge_index.T + self.node_counter
+
+        index_to_file = torch_geometric.utils.remove_self_loops(edge_index)[0].T + self.node_counter
         self.node_counter += v
         np.savetxt(self.files['A'], index_to_file.numpy(), fmt='%i')
         np.savetxt(self.files['pos'], node_poss.numpy())

@@ -38,7 +38,8 @@ class ModelTrainer:
                 data = data.to(self.device)
                 pred = self.model(data)
                 loss = self.loss_fn(pred, data.y)
-                # tan_loss = self.loss_fn(pred[:, 0]/pred[:, 1], data.y[:, 0]/data.y[:, 1])
+
+                # tan_loss = self.loss_fn(torch.atan2(pred[:, 1], pred[:, 0]), torch.atan2(data.y[:, 1], data.y[:, 0]))
                 # loss += tan_loss
                 self.optimizer.zero_grad()
                 loss.backward()

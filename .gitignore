@@ -150,3 +150,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 /data/
+/models/
+/old results/
+/results separate/
+/sr_out/

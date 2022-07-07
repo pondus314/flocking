@@ -1,6 +1,7 @@
 import pygame
 from enum import Enum
 import numpy as np
+import torch.linalg
 
 
 class Colour(Enum):
@@ -33,8 +34,8 @@ colour_order = [Colour.Red, Colour.Blue, Colour.Green, Colour.Cyan, Colour.Yello
 class Visualiser:
 
     def __init__(self):
-        self.HEIGHT = 800
-        self.AGENT_SIZE = 5
+        self.HEIGHT = 1000
+        self.AGENT_SIZE = 6
         self.initialised = False
 
     def setup(self, shape):
@@ -51,7 +52,9 @@ class Visualiser:
     def draw_past_positions(self, past_positions):
         for i, agent_positions in enumerate(past_positions):
             colour = colour_order[i % len(colour_order)].value
-            pygame.draw.lines(self.screen, colour, False, agent_positions.tolist())
+            last_pos = agent_positions[0]
+            start_idx = 0
+            pygame.draw.lines(self.screen, colour, False, agent_positions[start_idx:].tolist(), 3)
 
     def draw_agents(self, positions, velocities):
         for i, pos in enumerate(positions):
@@ -74,6 +77,7 @@ class Visualiser:
         self.draw_past_positions(past_positions)
         self.draw_agents(positions, velocities)
         pygame.display.flip()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
